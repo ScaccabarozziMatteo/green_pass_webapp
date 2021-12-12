@@ -1,13 +1,14 @@
 import React, {useState} from "react";
 import QRCode from "react-qr-code";
-
-
+import {Typography} from "@mui/material";
 // Import the MongoDB Realm Web SDK
 import * as Realm from "realm-web";
+
 //component need to convert string in bson
 const ObjectID = require("bson-objectid");
 //const REALM_APP_ID = "green_pass_app-ausoi"; // use this for original db
 const REALM_APP_ID = "application-test-realm-saghy"; // e.g. myapp-abcde
+
 const app = new Realm.App({ id: REALM_APP_ID });
 const mongodb = app.currentUser.mongoClient("mongodb-atlas");
 //const people = mongodb.db("covid_19_management").collection("people");
@@ -74,11 +75,13 @@ export default function QRgeneratorPage() {
     return(
 
         <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
-            <h2 align='center'>Green Pass QR generator</h2>
+
+            <Typography variant="h2" align='center'>Green Pass QR generator</Typography>
 
             <Login />
 
             <QRCode
+                level="H"
                 value={JSON.stringify({
                     name: 'Matteo',
                     surname: 'Scaccabarozzi',

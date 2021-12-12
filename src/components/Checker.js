@@ -1,6 +1,6 @@
 import React from 'react'
 import QrReader from 'react-qr-reader'
-import {Box, Button} from "@mui/material";
+import {Box, Button, Typography} from "@mui/material";
 import ResultPage from "./ResultPage";
 
 function Checker() {
@@ -31,6 +31,7 @@ function Checker() {
 
     return (
         <div>
+            <Typography variant="h2" align='center'>Green Pass reader</Typography>
             <Box maxWidth={'500px'} margin={'auto'} padding={'5%'}>
                 {!hideReader ?
                     <QrReader
