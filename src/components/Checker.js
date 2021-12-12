@@ -1,21 +1,26 @@
 import React from 'react'
 import QrReader from 'react-qr-reader'
 import {Box, Button} from "@mui/material";
+import ResultPage from "./ResultPage";
 
 function Checker() {
 
     const [result, setResult] = React.useState('')
     const [hideReader, setHideReader] = React.useState(true)
+    const [hideResult, setHideResult] = React.useState(true)
+
 
     function handleScan(data) {
         setResult(data);
         if (data !== null) {
             setHideReader(true);
+            setHideResult(false)
         }
     }
 
     function handleClickButton() {
         setHideReader(false);
+        setHideResult(true);
         setResult('')
     }
 
@@ -26,8 +31,7 @@ function Checker() {
 
     return (
         <div>
-            <p>{result}</p>
-            <Box maxWidth={'500px'} margin={'auto'}>
+            <Box maxWidth={'500px'} margin={'auto'} padding={'5%'}>
                 {!hideReader ?
                     <QrReader
                         id='qr_reader'
@@ -37,13 +41,19 @@ function Checker() {
                         onScan={handleScan}
                         style={{width: '100%'}}
                     /> :
-                    <Button
-                        variant={"contained"}
-                        style={{background: 'green', margin: '0 35%'}}
-                        onClick={handleClickButton}
-                    >
-                        New scan
-                    </Button>
+                    <React.Fragment>
+                        {!hideResult ?
+                            <ResultPage data={result}/>
+                            : ''
+                        }
+                        <Button
+                            variant={"contained"}
+                            style={{background: 'green', margin: '10% 35%'}}
+                            onClick={handleClickButton}
+                        >
+                            New scan
+                        </Button>
+                    </React.Fragment>
                 }
             </Box>
         </div>
