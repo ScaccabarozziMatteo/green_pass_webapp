@@ -33,21 +33,38 @@ const loginAnonymous = async (setUser) => {
 const validateQueryData = (qrData, dbData)=>{
     //db data contains the ful data
     //TODO add here the validation condition
-    console.log({
-        id: qrData.id,
-        name: qrData.name,
-        bday: qrData.bday,
-        surname: qrData.surname,
-        address: qrData.address,
-        validity : !!dbData
-    })
+    console.log(dbData)
+    let validity = false
+
+    const oneMonthMilliseconds = 2629800000
+    const thresholdSecondsVaccines = new Date().getTime() - 6 * oneMonthMilliseconds
+    const thresholdSecondsTests =    new Date().getTime() - 0.5 * oneMonthMilliseconds
+
+    //give validity if there is a vaccine injected less than 6 months ago
+    if(dbData && dbData.vaccines && dbData.vaccines.length > 0)
+        [...dbData.vaccines].forEach((vaccine)=>{
+            //console.log(vaccine.injection_date)
+            if(vaccine.injection_date)
+                if(new Date(vaccine.injection_date).getTime() >= thresholdSecondsVaccines)
+                    validity = true
+        })
+
+    //falsify validity if there is a positive test in the last 15 days
+    if(dbData && dbData.tests && dbData.tests.length > 0)
+        [...dbData.tests].forEach((test)=>{
+            //console.log(test.test_date)
+            if(test.test_date && test.result === 'positive')
+                if(new Date(test.test_date).getTime() >= thresholdSecondsTests)
+                    validity = false
+        })
+
     return {
         id: qrData.id,
         name: qrData.name,
         bday: qrData.bday,
         surname: qrData.surname,
         address: qrData.address,
-        validity : !!dbData
+        validity : validity
     }
 }
 

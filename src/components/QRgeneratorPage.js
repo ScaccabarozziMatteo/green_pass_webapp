@@ -36,7 +36,7 @@ const validateAndParsePersonJson = (person)=>{
 
 const QRgeneratorPage = () => {
     const [person, setPerson] = useState(null);
-    const [id, setId] = useState("61b641f56330b6c543bff738");
+    const [id, setId] = useState("61b641f56330b6c543bff73b");
     const [name, setName] = useState("");
     const [surname, setSurname] = useState("");
     const [address, setAddress] = useState("");
@@ -45,7 +45,6 @@ const QRgeneratorPage = () => {
     return(
 
         <div style={{marginTop:"2rem",display:"flex", flexDirection:"column", alignItems:"center"}}>
-
             <Typography variant="h2" align='center'>Green Pass QR generator</Typography>
             {person ?
                 <QRCode
@@ -53,10 +52,10 @@ const QRgeneratorPage = () => {
                     level="H"
                     value={validateAndParsePersonJson(person)}
                 />:null
-            }
+            }<Typography style={{marginTop:"1rem"}}>test valid id: 61b641f56330b6c543bff73b</Typography>
             <div style={{marginTop:"2rem",display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"space-between"}}>
                 <TextField
-                    style={{marginTop:"1rem"}}
+                    style={{marginTop:"1rem", width:"15rem"}}
                     value={id}
                     label="Enter id"
                     onChange={(e) => {
@@ -64,7 +63,7 @@ const QRgeneratorPage = () => {
                     }}
                 />
                 <TextField
-                    style={{marginTop:"1rem"}}
+                    style={{marginTop:"1rem", width:"15rem"}}
                     value={name}
                     label="Enter name"
                     onChange={(e) => {
@@ -72,7 +71,7 @@ const QRgeneratorPage = () => {
                     }}
                 />
                 <TextField
-                    style={{marginTop:"1rem"}}
+                    style={{marginTop:"1rem", width:"15rem"}}
                     value={surname}
                     label="Enter surname"
                     onChange={(e) => {
@@ -80,7 +79,7 @@ const QRgeneratorPage = () => {
                     }}
                 />
                 <TextField
-                    style={{marginTop:"1rem"}}
+                    style={{marginTop:"1rem", width:"15rem"}}
                     value={address}
                     label="Enter address"
                     onChange={(e) => {
@@ -88,7 +87,7 @@ const QRgeneratorPage = () => {
                     }}
                 />
                 <TextField
-                    style={{marginTop:"1rem"}}
+                    style={{marginTop:"1rem", width:"15rem"}}
                     value={bday}
                     label="Enter birthday"
                     onChange={(e) => {
@@ -103,7 +102,6 @@ const QRgeneratorPage = () => {
             >
                 Generate QR
             </Button>
-            {/*console.log(`Validated: ${validateAndParsePersonJson(person)}`)*/}
         </div>
     )
 }
