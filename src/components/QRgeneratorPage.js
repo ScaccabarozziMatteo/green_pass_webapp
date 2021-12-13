@@ -1,80 +1,109 @@
 import React, {useState} from "react";
 import QRCode from "react-qr-code";
 import {Button, Typography} from "@mui/material";
-import * as Realm from "realm-web";
+import TextField from "@mui/material/TextField";
 
-//component need to convert string in bson
-const ObjectID = require("bson-objectid");
-//const REALM_APP_ID = "green_pass_app-ausoi"; // use this for original db
-const REALM_APP_ID = "application-test-realm-saghy"; // e.g. myapp-abcde
-
-const app = new Realm.App({ id: REALM_APP_ID });
-const mongodb = app.currentUser.mongoClient("mongodb-atlas");
-//const people = mongodb.db("covid_19_management").collection("people");
-const people = mongodb.db("new_york_data").collection("new_york_crashes");
-
-
-// component to display DB user data
-function UserDetail({ user }) {
-    return (
-        <div>
-            <h1>Logged in with user id: {user.id}</h1>
-        </div>
-    );
+const  generateQR = (setPerson,id,name, surname, address, bday) => {
+    setPerson(
+        {
+            id: id,
+            name: name,
+            bday: bday,
+            surname: surname,
+            address: address,
+        }
+    )
 }
 
-// component for login in the realm app
-const  Login = ({setUser}) => {
-    const loginAnonymous = async () => {
-        //const user = await app.logIn(Realm.Credentials.emailPassword('test@gmail.com', 'test123'));
-        const user = await app.logIn(Realm.Credentials.emailPassword('test@gmail.com', '123456789'));
-        console.log(user)
-        setUser(user)
-    };
-    return <Button
-        variant={"contained"}
-        style={{background: 'green', margin: '10% 35%'}}
-        onClick={loginAnonymous}
-    >
-        Log In
-    </Button>;
-}
+const validateAndParsePersonJson = (person)=>{
+    if(!person)
+        return ""
 
-// wrapper component that run the query
-const  RunQuery = ({fetchFunction,setPerson, searchId}) => {
-    return <Button
-        variant={"contained"}
-        style={{background: 'green', margin: '10% 35%'}}
-        onClick={()=>fetchFunction(setPerson,searchId)}
-    > Generate QR</Button>;
-}
+    const id = person.id ? person.id : "not defined"
+    const name = person.name ? person.name : "not defined"
+    const surname = person.surname ? person.surname : "not defined"
+    const address = person.address ? person.address : "not defined"
+    const bday = person.bday ? person.bday : "not defined"
 
-// use this function setting the searchID to get a person with that id
-const fetchPersonById = async (setPersonObject, searchId) =>{
-    people.findOne({ "_id" : ObjectID(searchId)})
-        .then((p)=>{
-            setPersonObject(p)
-            console.log(p)
-        })
+    return JSON.stringify({
+        id: id,
+        name: name,
+        bday: bday,
+        surname: surname,
+        address: address,
+    })
 }
 
 const QRgeneratorPage = () => {
-    const [user, setUser] = useState(app.currentUser);
     const [person, setPerson] = useState(null);
+    const [id, setId] = useState("61b641f56330b6c543bff738");
+    const [name, setName] = useState("");
+    const [surname, setSurname] = useState("");
+    const [address, setAddress] = useState("");
+    const [bday, setBday] = useState("");
 
     return(
 
-        <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
+        <div style={{marginTop:"2rem",display:"flex", flexDirection:"column", alignItems:"center"}}>
 
             <Typography variant="h2" align='center'>Green Pass QR generator</Typography>
             {person ?
                 <QRCode
+                    style={{marginTop:"2rem"}}
                     level="H"
-                    value={JSON.stringify(person)}
+                    value={validateAndParsePersonJson(person)}
                 />:null
             }
-            <RunQuery fetchFunction={fetchPersonById} setPerson={setPerson} searchId={"617fcaf8db758795fcadb1a7"}/>
-            {user ? <UserDetail user={user} /> : <Login setUser={setUser} />}
+            <div style={{marginTop:"2rem",display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"space-between"}}>
+                <TextField
+                    style={{marginTop:"1rem"}}
+                    value={id}
+                    label="Enter id"
+                    onChange={(e) => {
+                        setId(e.target.value);
+                    }}
+                />
+                <TextField
+                    style={{marginTop:"1rem"}}
+                    value={name}
+                    label="Enter name"
+                    onChange={(e) => {
+                        setName(e.target.value);
+                    }}
+                />
+                <TextField
+                    style={{marginTop:"1rem"}}
+                    value={surname}
+                    label="Enter surname"
+                    onChange={(e) => {
+                        setSurname(e.target.value);
+                    }}
+                />
+                <TextField
+                    style={{marginTop:"1rem"}}
+                    value={address}
+                    label="Enter address"
+                    onChange={(e) => {
+                        setAddress(e.target.value);
+                    }}
+                />
+                <TextField
+                    style={{marginTop:"1rem"}}
+                    value={bday}
+                    label="Enter birthday"
+                    onChange={(e) => {
+                        setBday(e.target.value);
+                    }}
+                />
+            </div>
+            <Button
+                variant={"contained"}
+                style={{background: 'green', margin: '10% 35%'}}
+                onClick={()=>generateQR(setPerson,id, name, surname, address,bday)}
+            >
+                Generate QR
+            </Button>
+            {/*console.log(`Validated: ${validateAndParsePersonJson(person)}`)*/}
         </div>
     )
 }

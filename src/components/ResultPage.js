@@ -1,22 +1,28 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Alert, Box, Typography} from "@mui/material";
 
-export default function ResultPage(props) {
+/* object obtained in personData
+{
+    name
+    address
+    surname
+    bday
+    validity
+}
+* */
 
-    const [data, setData] = React.useState({
-        name: JSON.parse(props.data).name,
-        surname: JSON.parse(props.data).surname,
-        birthdate: JSON.parse(props.data).birthdate,
-        validity: JSON.parse(props.data).validity
-    })
+export default function ResultPage({personData}) {
+    const [data, setData] = React.useState(personData ? JSON.parse(personData) : {})
 
     return(
         <React.Fragment>
             <Box>
                 <Typography variant='h3'>GP certificate</Typography>
+                <Typography variant='h5'>Id: {data.id}</Typography>
                 <Typography variant='h5'>Name: {data.name}</Typography>
                 <Typography variant='h5'>Surname: {data.surname}</Typography>
-                <Typography variant='h5'>Date of birth: {data.birthdate}</Typography>
+                <Typography variant='h5'>Date of birth: {data.bday}</Typography>
+                <Typography variant='h5'>Address: {data.address}</Typography>
                 {data.validity ?
                 <Alert severity="success" variant="filled" style={{margin: '5% 0'}}>Valid!</Alert>
                 :
