@@ -25,7 +25,7 @@ function UserDetail({ user}) {
 const loginAnonymous = async (setUser) => {
     const user = await app.logIn(Realm.Credentials.emailPassword('test@gmail.com', 'test123'));
     //const user = await app.logIn(Realm.Credentials.emailPassword('test@gmail.com', '123456789'));
-    console.log(user)
+    //console.log(user)
     setUser(user)
 };
 
@@ -33,6 +33,14 @@ const loginAnonymous = async (setUser) => {
 const validateQueryData = (qrData, dbData)=>{
     //db data contains the ful data
     //TODO add here the validation condition
+    console.log({
+        id: qrData.id,
+        name: qrData.name,
+        bday: qrData.bday,
+        surname: qrData.surname,
+        address: qrData.address,
+        validity : !!dbData
+    })
     return {
         id: qrData.id,
         name: qrData.name,
@@ -53,7 +61,7 @@ const validateAndParsePersonJson = (person)=>{
     const address = person.address ? person.address : "not defined"
     const bday = person.bday ? person.bday : "not defined"
     const id = person.id ? person.id : "not defined"
-    const validity = person.validity ? person.validity : "not defined"
+    const validity = person.validity ? person.validity : false
 
     return JSON.stringify({
         name: name,
@@ -66,89 +74,12 @@ const validateAndParsePersonJson = (person)=>{
 }
 
 
-//DELETE IN PRODUCTION the query will return this structure
-const testPerson = {
-    "name": "Helsa",
-    "surname": "Thunell",
-    "address": "62951 Moulton Place",
-    "zip_code": "TR",
-    "city": "Dibrugarh",
-    "email": "Helsa.Thunell@gmail.com",
-    "telephone_number": 3719447379,
-    "vaccines": [
-        {
-            "brand": "moderna",
-            "lot": 300142,
-            "type": 2,
-            "production_date": {
-                "$date": "2020-11-02T20:58:00.000+00:00"
-            },
-            "injection_date": {
-                "$date": "2021-04-12T11:13:00.000+00:00"
-            },
-            "vaccine_hub": {
-                "name": "Magdalen",
-                "authorization_number": 1162,
-                "zip_code": "SK",
-                "city": "Mata-Utu",
-                "location": {
-                    "latitude": -77.194,
-                    "longitude": 49.201
-                },
-                "hub_type": "hospital",
-                "address": "2079 Ludington Plaza"
-            },
-            "healthcare_personnel": [
-                {
-                    "name": "Brandise",
-                    "surname": "Sacken",
-                    "role": "doctor",
-                    "work_id": 8749619910
-                },
-                {
-                    "name": "Emma",
-                    "surname": "Shaddock",
-                    "role": "nurse",
-                    "work_id": 1763350619
-                }
-            ]
-        }
-    ],
-    "tests": [
-        {
-            "test_date": {
-                "$date": "2021-03-25T15:41:00.000+00:00"
-            },
-            "test_hub": {
-                "name": "Maxi",
-                "authorization_number": 1088,
-                "zip_code": "SR",
-                "city": "Blantyre",
-                "location": {
-                    "latitude": 7.618,
-                    "longitude": -161.117
-                },
-                "hub_type": "military",
-                "address": "75153 Saint Paul Place"
-            },
-            "result": "negative"
-        }
-    ],
-    "emergency_contact": {
-        "name": "Damaris",
-        "surname": "Tamsky",
-        "zip_code": "LC",
-        "city": "The Hague",
-        "email": "Damaris.Tamsky@gmail.com",
-        "telephone_number": 3375858737
-    }
-}
-
 function Checker() {
     const [user, setUser] = useState(null);
     const [db, setDb] = useState(null);
     const [resultScan, setResultScan] = useState('')            //result of the QR scan
-    const [processedResult, setProcessedResult] = useState('')     //result of green pass check
+    const [processedResult, setProcessedResult] = useState('')     //result of green pass check JSON
+    const [processedResultStr, setProcessedResultStr] = useState('')     //result of green pass check text for result component
     const [hideReader, setHideReader] = useState(true)
     const [hideResult, setHideResult] = useState(true)
 
@@ -166,16 +97,22 @@ function Checker() {
     useEffect( ()=>{
         if(resultScan) {
             const jsonResultScan = {...JSON.parse(resultScan)}
-            console.log(`query over ${jsonResultScan}`)
-            db.findOne({ "_id" : ObjectID(jsonResultScan.id)})
-                .then((p)=>{
-                    setProcessedResult(validateQueryData(jsonResultScan, p))
-                    console.log(`validated data ${validateQueryData(jsonResultScan, p)}`)
-                    console.log("proccessed result")
-                    console.log(processedResult)
-                })
+
+            //id lenght should be 24 characters to be corrected
+            if(jsonResultScan.id && (jsonResultScan.id.toString().length === 24))
+                db.findOne({ "_id" : ObjectID(jsonResultScan.id)})
+                    .then((p)=>{
+                        setProcessedResult(validateQueryData(jsonResultScan, p))
+                    })
+
+            else setProcessedResult(validateQueryData(jsonResultScan, false))
         }
     },[resultScan])
+
+    //effect of changes in processResult json converted to string and validated
+    useEffect( ()=>{
+        setProcessedResultStr(validateAndParsePersonJson(processedResult))
+    },[processedResult])
 
 
     function handleScan(data) {
@@ -190,6 +127,7 @@ function Checker() {
         setHideReader(false);
         setHideResult(true);
         setResultScan('')
+        setProcessedResultStr('')
     }
 
     function handleError(err) {
@@ -211,22 +149,24 @@ function Checker() {
                         style={{width: '100%'}}
                     /> :
                     <React.Fragment>
-                        {!hideResult ?
-                            <ResultPage personData={validateAndParsePersonJson(processedResult)}/>
+                        {!hideResult && processedResultStr ?
+                            <ResultPage personData={processedResultStr}/>
                             : ''
                         }
-                        <Button
-                            variant={"contained"}
-                            style={{background: 'green', margin: '10% 35%'}}
-                            onClick={handleClickButton}
-                        >
-                            New scan
-                        </Button>
+                        {user ?
+                            <Button
+                                variant={"contained"}
+                                style={{background: 'green', margin: '10% 35%'}}
+                                onClick={handleClickButton}
+                            >
+                                New scan
+                            </Button>
+                            : null}
                     </React.Fragment>
                 }
             </Box>
         </div>
     )
 }
-//<RunQuery fetchFunction={fetchPersonById} setPerson={setPerson} searchId={"61b641f56330b6c543bff738"}/>
+
 export default Checker;
