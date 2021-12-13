@@ -70,10 +70,21 @@ export default function QRgeneratorPage() {
     const [person, setPerson] = useState(null);
 
     return(
-        <div>
-            {user ? <UserDetail user={user} /> : <Login setUser={setUser} />}
+        <div style={{display:"flex", flexDirection:"column", alignItems:"center"}}>
+            <h2 align='center'>Green Pass QR generator</h2>
+
+            <QRCode
+                style={{position:"center"}}
+                level="H"
+                value={JSON.stringify({
+                    name: 'Matteo',
+                    surname: 'Scaccabarozzi',
+                    birthdate: '02-04-1996',
+                    validity: true
+                })}
+            />
             <RunQuery fetchFunction={fetchPersonById} setPerson={setPerson} searchId={"617fcaf8db758795fcadb1a7"}/>
-            QR Generator Page
+            {user ? <UserDetail user={user} /> : <Login setUser={setUser} />}
         </div>
     )
 }
