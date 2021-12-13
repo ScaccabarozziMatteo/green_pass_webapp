@@ -1,35 +1,78 @@
-import React from "react";
+import React, {useState} from "react";
 
 // Import the MongoDB Realm Web SDK
 import * as Realm from "realm-web";
-
-// Connect to your MongoDB Realm app
-const REALM_APP_ID = "application-0-uiwse"; // e.g. myapp-abcde
+//import Realm from "realm"
+const ObjectID = require("bson-objectid");
+//const REALM_APP_ID = "green_pass_app-ausoi";
+const REALM_APP_ID = "application-test-realm-saghy"; // e.g. myapp-abcde
 const app = new Realm.App({ id: REALM_APP_ID });
+const mongodb = app.currentUser.mongoClient("mongodb-atlas");
+//const people = mongodb.db("covid_19_management").collection("people");
+const people = mongodb.db("new_york_data").collection("new_york_crashes");
+
+
+const PersonSchema = {
+    name: "Person",
+    properties: { //person
+        _id: "objectId",
+        name: "string",
+        surname: "string",
+        bday: "date",
+        address: "string",
+        zip_code: "string",
+        city: "string",
+        email: "string",
+        telephone_number: "int",
+        vaccines: "data",
+        tests: "data",
+        emergency_contact: "data?"
+    }
+    ,
+    primaryKey: "_id",
+};
+
 
 // Create a component that displays the given user's details
 function UserDetail({ user }) {
     return (
         <div>
-            <h1>Logged in with anonymous id: {user.id}</h1>
+            <h1>Logged in with id: {user.id}</h1>
         </div>
     );
 }
 
 // Create a component that lets an anonymous user log in
-function Login() {
+const  Login = ({setUser}) => {
     const loginAnonymous = async () => {
-        const user = await app.logIn(Realm.Credentials.emailPassword('barozzi966@gmail.com', 'ciaociao'));
+        //const user = await app.logIn(Realm.Credentials.emailPassword('test@gmail.com', 'test123'));
+        const user = await app.logIn(Realm.Credentials.emailPassword('test@gmail.com', '123456789'));
         console.log(user)
+        setUser(user)
     };
     return <button onClick={loginAnonymous}>Log In</button>;
 }
+const  RunQuery = ({fetchFunction,setPerson, searchId}) => {
+    return <button onClick={()=>fetchFunction(setPerson,searchId)}>Run Query</button>;
+}
+
+const fetchPersonById = async (setPersonObject, searchId) =>{
+
+    //setPersonObject(person)
+    //console.log(person)
+    //const numPlants = await people.count();
+    people.findOne({ "_id" : ObjectID(searchId)}).then((p)=>console.log(p)) //need to convert in BSON
+    //console.log(`There are ${numPlants} plants in the collection`);
+}
 
 export default function QRgeneratorPage() {
+    const [user, setUser] = useState(app.currentUser);
+    const [person, setPerson] = useState(null);
 
     return(
         <div>
-            <Login />
+            {user ? <UserDetail user={user} /> : <Login setUser={setUser} />}
+            <RunQuery fetchFunction={fetchPersonById} setPerson={setPerson} searchId={"617fcaf8db758795fcadb1a7"}/>
             QR Generator Page
         </div>
     )

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/mongodb_gp.iml" filepath="$PROJECT_DIR$/.idea/mongodb_gp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/green_pass_webapp.iml" filepath="$PROJECT_DIR$/.idea/green_pass_webapp.iml" />
     </modules>
   </component>
 </project>
