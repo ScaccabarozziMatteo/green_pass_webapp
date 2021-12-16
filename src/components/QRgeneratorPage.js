@@ -52,7 +52,7 @@ const QRgeneratorPage = () => {
                     level="H"
                     value={validateAndParsePersonJson(person)}
                 />:null
-            }<Typography style={{marginTop:"1rem"}}>test valid id: 61b641f56330b6c543bff73b</Typography>
+            }
             <div style={{marginTop:"2rem",display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"space-between"}}>
                 <TextField
                     style={{marginTop:"1rem", width:"15rem"}}

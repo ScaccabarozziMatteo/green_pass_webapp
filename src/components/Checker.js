@@ -60,10 +60,10 @@ const validateQueryData = (qrData, dbData)=>{
 
     return {
         id: qrData.id,
-        name: qrData.name,
-        bday: qrData.bday,
-        surname: qrData.surname,
-        address: qrData.address,
+        name: dbData.name,
+        bday: dbData.bday,
+        surname: dbData.surname,
+        address: dbData.address,
         validity : validity
     }
 }
